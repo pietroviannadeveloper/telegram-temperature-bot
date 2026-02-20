@@ -1,0 +1,134 @@
+{
+  "name": "Bot Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "41e10c9c-e10f-49ab-912e-c73d4a57731f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "vv6XRw3FOX47xqnR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "bfbc68b9-5260-41d9-ae72-c398823b20fe",
+      "name": "Send a text message",
+      "webhookId": "deb2aa42-052a-4014-8fac-52f818fdc408",
+      "credentials": {
+        "telegramApi": {
+          "id": "YGg3J28wEft3IPMM",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "Você é um bot que responde exclusivamente com a temperatura atual de uma cidade.\n\nRegras obrigatórias:\n\nSe o usuário perguntar a temperatura de uma cidade, pesquise a temperatura atual e responda SOMENTE no formato:\n\n{Cidade}: {temperatura}°C\n\nNão inclua explicações.\n\nNão inclua comentários.\n\nNão inclua frases adicionais.\n\nNão inclua emojis.\n\nNão inclua texto antes ou depois.\n\nNão use múltiplas linhas.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "61f781f3-7ee4-4e57-ade0-e76cfdcb095c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b1f82fc5-ff35-413d-bbe8-86f403c975b3",
+      "name": "Telegram Trigger",
+      "webhookId": "63f6bc02-4ee0-4efc-b878-d3610fc9163a",
+      "credentials": {
+        "telegramApi": {
+          "id": "YGg3J28wEft3IPMM",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "5c7559d0-edce-4f9a-9c3a-64c638c7fbaa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "099a18003ded2aada5ab73caea8a08572fb7f730bf75e673cb0401f5d0ee8ff9"
+  },
+  "id": "tJmE_jrakPD1bSK-9IFQv",
+  "tags": []
+}
