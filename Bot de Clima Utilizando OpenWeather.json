@@ -1,0 +1,183 @@
+{
+  "name": "Bot de Clima Utilizando OpenWeather",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        368,
+        336
+      ],
+      "typeVersion": 1,
+      "id": "6ea94dcd-a2d9-4fb9-bfa9-396d5a711794",
+      "webhookId": "55008fd3-4c94-44d7-8c33-38c9d43d8b43",
+      "credentials": {
+        "telegramApi": {
+          "id": "YGg3J28wEft3IPMM",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "cityName": "={{ \n  $json.message.text\n    .replace(/^(\\/)?(clima|temperatura)\\s*/i, '')\n    .trim()\n}}",
+        "language": "pt_br"
+      },
+      "name": "OpenWeatherMap",
+      "type": "n8n-nodes-base.openWeatherMap",
+      "position": [
+        816,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "e9b91cf5-47c3-4180-a982-dc0be2f31086",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "RiviwM6wSh9Gt2UB",
+          "name": "OpenWeatherMap account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "text": "=Agora em {{$node[\"OpenWeatherMap\"].json[\"name\"]}}: {{$node[\"OpenWeatherMap\"].json[\"weather\"][0][\"description\"]}}.\nTemperatura: {{ Math.round($node[\"OpenWeatherMap\"].json[\"main\"][\"temp\"]) }}°C\nSensação térmica: {{ Math.round($node[\"OpenWeatherMap\"].json[\"main\"][\"feels_like\"]) }}°C 🙂",
+        "additionalFields": {}
+      },
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1040,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "f89d29b3-aa48-44cc-89b8-36167a43c2c3",
+      "webhookId": "ce588548-ad47-4c33-94ec-ffa148a7520a",
+      "credentials": {
+        "telegramApi": {
+          "id": "YGg3J28wEft3IPMM",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8c8eb07d-7c47-48fe-9fec-40ddf8882261",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "^(\\/)?(clima|temperatura)\\b",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        592,
+        336
+      ],
+      "id": "cc548000-2920-432f-a109-90b69cc4a622",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "text": "Use: clima <cidade> temperatura <cidade>  Ex: clima São Paulo,br",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        816,
+        432
+      ],
+      "id": "e639632b-68c1-4aec-bf4c-8fdf552dc355",
+      "name": "Send a text message",
+      "webhookId": "77f7ffe8-6a2a-436b-bae5-845bac99e025",
+      "credentials": {
+        "telegramApi": {
+          "id": "YGg3J28wEft3IPMM",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenWeatherMap": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "OpenWeatherMap",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "d097dfb8-dc27-480c-9c2f-0b94758984e5",
+  "meta": {
+    "templateId": "346",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "099a18003ded2aada5ab73caea8a08572fb7f730bf75e673cb0401f5d0ee8ff9"
+  },
+  "id": "glFte4gG_5d4TFcJX1_f0",
+  "tags": []
+}
